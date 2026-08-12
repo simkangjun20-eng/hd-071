@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PROJECT HUB | 사내 프로젝트 포털</title>
+  <meta name="description" content="사내 프로젝트 참여와 자료 공유를 위한 프로젝트 포털" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --navy:#07142d; --navy2:#0b1f46; --royal:#315eea; --royal2:#4b7cff;
+      --accent:#35d7ff; --white:#f7f9ff; --muted:#9eacc7; --line:rgba(255,255,255,.11);
+      --card:rgba(11,31,70,.72); --danger:#ff5f7a; --success:#45e0a1;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:var(--navy);color:var(--white);font-family:"Nanum Gothic",sans-serif;line-height:1.65}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1180px,92%);margin:auto}
+    header{position:fixed;z-index:50;top:0;left:0;right:0;background:rgba(7,20,45,.68);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-weight:800;letter-spacing:-.04em;font-size:21px}.logo span{color:var(--accent)}
+    .navlinks{display:flex;gap:24px;color:#d7e0f5;font-size:14px}
+    .navlinks a:hover{color:var(--accent)}
+    .auth-actions{display:flex;gap:8px}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--white);border-radius:10px;padding:10px 15px;font-weight:700}
+    .btn:hover{border-color:rgba(53,215,255,.5);transform:translateY(-1px)}
+    .btn.primary{border:0;background:linear-gradient(135deg,var(--royal),var(--royal2));box-shadow:0 8px 28px rgba(49,94,234,.25)}
+    .btn.accent{border:0;background:linear-gradient(135deg,#18bde8,var(--accent));color:#02152a}
+    .hero{min-height:760px;display:grid;place-items:center;position:relative;overflow:hidden;padding-top:72px}
+    #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.62}
+    .hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,transparent 0,rgba(7,20,45,.22) 35%,rgba(7,20,45,.96) 100%)}
+    .orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.26;animation:float 8s ease-in-out infinite}
+    .orb.one{width:330px;height:330px;background:var(--royal);left:-100px;top:180px}.orb.two{width:260px;height:260px;background:var(--accent);right:-70px;top:280px;animation-delay:-3s}
+    @keyframes float{50%{transform:translate3d(0,-28px) scale(1.06)}}
+    .hero-content{position:relative;z-index:2;text-align:center;max-width:850px}
+    .eyebrow{display:inline-flex;padding:7px 12px;border:1px solid rgba(53,215,255,.25);background:rgba(53,215,255,.07);border-radius:99px;color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.08em}
+    h1{font-size:clamp(42px,7vw,78px);line-height:1.08;letter-spacing:-.06em;margin:20px 0 18px}
+    h1 strong{color:var(--accent)} .hero p{color:#c1cce2;font-size:18px;max-width:690px;margin:0 auto 30px}
+    .hero-cta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .section{padding:90px 0}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:26px}
+    .section h2{font-size:32px;letter-spacing:-.04em;margin:0}.section-head p{margin:6px 0 0;color:var(--muted)}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .card{background:linear-gradient(160deg,rgba(20,47,96,.78),rgba(8,23,50,.78));border:1px solid var(--line);border-radius:18px;padding:22px;min-height:180px}
+    .icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(49,94,234,.18);color:var(--accent);font-size:21px;margin-bottom:18px}
+    .card h3{margin:0 0 7px}.card p{color:var(--muted);font-size:14px;margin:0}
+    .board-wrap{background:rgba(4,15,34,.5);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:5px;margin-bottom:18px}.tab{white-space:nowrap;border:1px solid var(--line);background:transparent;color:#afbdd5;border-radius:10px;padding:11px 16px}.tab.active{background:var(--royal);color:#fff;border-color:transparent}
+    .board-toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}.search{width:min(320px,100%);background:#07172f;border:1px solid var(--line);color:white;border-radius:10px;padding:11px 13px}
+    .board-list{display:grid;gap:9px}.post{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;padding:17px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(11,31,70,.48)}
+    .post-num{color:#7484a3;font-size:13px;text-align:center}.post-title{font-weight:700}.post-meta{color:#7f8fab;font-size:12px;margin-top:4px}.badge{display:inline-block;font-size:11px;padding:3px 7px;border-radius:5px;margin-right:6px;background:rgba(53,215,255,.1);color:var(--accent)}
+    .empty{padding:50px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-item{aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#091a36;position:relative}.gallery-item img{width:100%;height:100%;object-fit:cover}.gallery-item .caption{position:absolute;left:0;right:0;bottom:0;padding:25px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:13px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.step{position:relative;padding:25px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.stepno{font-size:12px;color:var(--accent);font-weight:800}
+    footer{padding:35px 0;border-top:1px solid var(--line);color:#7484a3;font-size:13px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal-box{width:min(520px,100%);background:#0a1c3d;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 30px 90px rgba(0,0,0,.45)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.close{background:none;border:0;color:#9eacc7;font-size:24px}
+    .form{display:grid;gap:12px;margin-top:18px}.form label{font-size:13px;color:#b8c5dc}.form input,.form textarea,.form select{width:100%;border:1px solid var(--line);background:#06152f;color:#fff;border-radius:10px;padding:12px;outline:none}.form textarea{min-height:130px;resize:vertical}.form input:focus,.form textarea:focus{border-color:var(--royal2)}
+    .hint{font-size:12px;color:#8493af}.status{font-size:13px;margin-top:8px}.status.error{color:var(--danger)}.status.ok{color:var(--success)}
+    .userbar{font-size:12px;color:#b7c4da;display:flex;gap:8px;align-items:center}
+    @media(max-width:900px){.cards,.gallery{grid-template-columns:repeat(2,1fr)}.navlinks{display:none}.steps{grid-template-columns:1fr}}
+    @media(max-width:600px){.cards,.gallery{grid-template-columns:1fr}.post{grid-template-columns:1fr}.post-num{text-align:left}.section{padding:65px 0}.hero{min-height:690px}.board-toolbar{align-items:stretch;flex-direction:column}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a class="logo" href="#home">PROJECT<span>HUB</span></a>
+    <nav class="navlinks"><a href="#guide">참여안내</a><a href="#boards">게시판</a><a href="#gallery">갤러리</a></nav>
+    <div class="auth-actions" id="authActions"><button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">회원가입</button></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <canvas id="heroCanvas"></canvas><div class="orb one"></div><div class="orb two"></div>
+    <div class="container hero-content">
+      <span class="eyebrow">IN-HOUSE PROJECT PORTAL</span>
+      <h1>함께 만들고,<br><strong>함께 성장하는</strong> 프로젝트 허브</h1>
+      <p>홍보실에서 운영하는 사내 프로젝트 공간입니다. 프로젝트 공지부터 실무 자료, 구성원 아이디어와 현장 기록까지 한곳에서 확인하고 참여하세요.</p>
+      <div class="hero-cta"><a class="btn primary" href="#boards">프로젝트 게시판 보기</a><button class="btn accent" onclick="openModal('signupModal')">프로젝트 참여하기</button></div>
+    </div>
+  </section>
+
+  <section class="section" id="guide">
+    <div class="container">
+      <div class="section-head"><div><h2>프로젝트 참여 안내</h2><p>회원가입 후 필요한 정보를 확인하고 프로젝트에 참여하세요.</p></div></div>
+      <div class="steps">
+        <div class="step"><div class="stepno">STEP 01</div><h3>회원가입</h3><p>회사에서 사용하는 이메일로 간단하게 가입하고 계정을 인증합니다.</p></div>
+        <div class="step"><div class="stepno">STEP 02</div><h3>게시판 확인</h3><p>공지사항, 웹진형 자유게시판, 자료실, 갤러리에서 프로젝트 소식을 확인합니다.</p></div>
+        <div class="step"><div class="stepno">STEP 03</div><h3>프로젝트 참여</h3><p>아이디어와 의견을 공유하고 필요한 자료를 업로드하며 프로젝트에 참여합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section board-wrap" id="boards">
+    <div class="container">
+      <div class="section-head"><div><h2>PROJECT BOARD</h2><p id="boardDesc">프로젝트 운영에 필요한 정보를 한곳에서 관리합니다.</p></div><button class="btn primary" id="writeBtn" onclick="openWriteModal()">글쓰기</button></div>
+      <div class="tabs">
+        <button class="tab active" data-type="notice">공지사항</button>
+        <button class="tab" data-type="webzine">자유게시판 · 웹진</button>
+        <button class="tab" data-type="resource">자료실</button>
+        <button class="tab" data-type="gallery">갤러리</button>
+      </div>
+      <div class="board-toolbar"><div id="loginState" class="userbar">로그인하면 글쓰기와 자료 업로드가 가능합니다.</div><input id="searchInput" class="search" placeholder="게시글 검색" /></div>
+      <div id="boardContent" class="board-list"></div>
+    </div>
+  </section>
+
+  <section class="section" id="gallery">
+    <div class="container">
+      <div class="section-head"><div><h2>PROJECT GALLERY</h2><p>프로젝트의 주요 순간을 기록합니다.</p></div></div>
+      <div id="galleryGrid" class="gallery"></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="container">© 2026 PROJECT HUB · 홍보실 사내 프로젝트 포털</div></footer>
+
+<!-- Login -->
+<div class="modal" id="loginModal"><div class="modal-box">
+  <div class="modal-head"><h3>로그인</h3><button class="close" onclick="closeModal('loginModal')">×</button></div>
+  <form class="form" id="loginForm"><label>이메일<input type="email" id="loginEmail" required></label><label>비밀번호<input type="password" id="loginPassword" required minlength="6"></label><button class="btn primary">로그인</button><div id="loginStatus" class="status"></div></form>
+</div></div>
+
+<!-- Signup -->
+<div class="modal" id="signupModal"><div class="modal-box">
+  <div class="modal-head"><h3>회원가입</h3><button class="close" onclick="closeModal('signupModal')">×</button></div>
+  <form class="form" id="signupForm"><label>이름<input type="text" id="signupName" required maxlength="50"></label><label>이메일<input type="email" id="signupEmail" required></label><label>비밀번호<input type="password" id="signupPassword" required minlength="6"></label><div class="hint">가입 후 Supabase 이메일 인증이 활성화되어 있다면 인증 메일을 확인하세요.</div><button class="btn primary">계정 만들기</button><div id="signupStatus" class="status"></div></form>
+</div></div>
+
+<!-- Write -->
+<div class="modal" id="writeModal"><div class="modal-box">
+  <div class="modal-head"><h3>게시글 작성</h3><button class="close" onclick="closeModal('writeModal')">×</button></div>
+  <form class="form" id="writeForm"><label>게시판<select id="writeType"><option value="webzine">자유게시판 · 웹진</option><option value="resource">자료실</option><option value="gallery">갤러리</option><option value="notice">공지사항</option></select></label><label>제목<input id="writeTitle" required maxlength="200"></label><label>내용<textarea id="writeContent" required></textarea></label><label id="fileLabel">첨부파일<input type="file" id="writeFile"></label><div class="hint">공지사항은 관리자 계정만 등록할 수 있습니다. 자료실/갤러리는 로그인 사용자에게 업로드 권한을 줄 수 있습니다.</div><button class="btn primary">등록하기</button><div id="writeStatus" class="status"></div></form>
+</div></div>
+
+<script>
+const SUPABASE_URL = "https://tegdqepcfgezspevtsrq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jq0e_5zHraBjEdZOdehB7A_vtms5SJl";
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+let currentType = "notice";
+let currentUser = null;
+
+const descriptions = {
+  notice:"프로젝트 일정과 주요 공지를 확인합니다.",
+  webzine:"구성원의 이야기와 아이디어를 웹진처럼 공유합니다.",
+  resource:"프로젝트 문서와 업무 자료를 공유합니다.",
+  gallery:"프로젝트 활동 사진과 결과물을 기록합니다."
+};
+
+function openModal(id){document.getElementById(id).classList.add("show")}
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+
+function escapeHtml(v=""){return v.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function refreshAuth(){
+  const {data:{session}}=await db.auth.getSession();
+  currentUser=session?.user||null;
+  const box=document.getElementById("authActions");
+  const state=document.getElementById("loginState");
+  if(currentUser){
+    const name=currentUser.user_metadata?.name||currentUser.email;
+    box.innerHTML=`<span class="userbar">${escapeHtml(name)}</span><button class="btn" onclick="logout()">로그아웃</button>`;
+    state.innerHTML=`<span class="userbar">● ${escapeHtml(name)}님 로그인 상태 · 게시글 작성 가능</span>`;
+  }else{
+    box.innerHTML=`<button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">회원가입</button>`;
+    state.textContent="로그인하면 글쓰기와 자료 업로드가 가능합니다.";
+  }
+}
+async function logout(){await db.auth.signOut(); await refreshAuth(); loadBoard();}
+
+async function signup(e){
+  e.preventDefault(); const s=document.getElementById("signupStatus");
+  s.className="status"; s.textContent="가입 처리 중...";
+  const email=document.getElementById("signupEmail").value.trim(), password=document.getElementById("signupPassword").value, name=document.getElementById("signupName").value.trim();
+  const {error}=await db.auth.signUp({email,password,options:{data:{name}}});
+  if(error){s.className="status error";s.textContent=error.message;return}
+  s.className="status ok";s.textContent="가입되었습니다. 이메일 인증이 필요한 경우 인증 메일을 확인하세요.";
+  e.target.reset();
+}
+async function login(e){
+  e.preventDefault(); const s=document.getElementById("loginStatus"); s.textContent="로그인 중...";
+  const {error}=await db.auth.signInWithPassword({email:document.getElementById("loginEmail").value.trim(),password:document.getElementById("loginPassword").value});
+  if(error){s.className="status error";s.textContent=error.message;return}
+  s.className="status ok";s.textContent="로그인 성공";
+  setTimeout(()=>{closeModal("loginModal");s.textContent="";refreshAuth();loadBoard()},300);
+}
+document.getElementById("signupForm").addEventListener("submit",signup);
+document.getElementById("loginForm").addEventListener("submit",login);
+db.auth.onAuthStateChange(()=>refreshAuth());
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
+  currentType=t.dataset.type; document.getElementById("boardDesc").textContent=descriptions[currentType]; loadBoard();
+}));
+document.getElementById("searchInput").addEventListener("input",()=>loadBoard());
+
+async function loadBoard(){
+  const el=document.getElementById("boardContent"); el.innerHTML='<div class="empty">불러오는 중...</div>';
+  const q=document.getElementById("searchInput").value.trim();
+  let query=db.from("posts").select("id,title,content,post_type,created_at,author_id,attachment_url,attachment_name").eq("post_type",currentType).order("created_at",{ascending:false}).limit(50);
+  if(q) query=query.or(`title.ilike.%${q}%,content.ilike.%${q}%`);
+  const {data,error}=await query;
+  if(error){el.innerHTML=`<div class="empty">게시판을 불러오지 못했습니다.<br><small>${escapeHtml(error.message)}</small></div>`;return}
+  if(!data?.length){el.innerHTML='<div class="empty">등록된 게시글이 없습니다.</div>';return}
+  el.innerHTML=data.map((p,i)=>`
+    <article class="post" onclick="openPost('${p.id}')">
+      <div class="post-num">${String(i+1).padStart(2,"0")}</div>
+      <div><div class="post-title">${currentType==="notice"?'<span class="badge">NOTICE</span>':""}${escapeHtml(p.title)}</div><div class="post-meta">${new Date(p.created_at).toLocaleDateString("ko-KR")} · ${p.attachment_url?"첨부파일 있음":""}</div></div>
+      <div class="post-meta">›</div>
+    </article>`).join("");
+}
+async function openPost(id){
+  const {data,error}=await db.from("posts").select("*").eq("id",id).single();
+  if(error)return alert(error.message);
+  let extra=data.attachment_url?`<p><a class="btn" target="_blank" href="${data.attachment_url}">첨부파일 열기${data.attachment_name?" · "+escapeHtml(data.attachment_name):""}</a></p>`:"";
+  alert(`${data.title}\n\n${data.content}\n\n${data.created_at?new Date(data.created_at).toLocaleString("ko-KR"):""}${data.attachment_url?"\n\n첨부파일이 있습니다.":""}`);
+}
+
+async function openWriteModal(){
+  if(!currentUser){openModal("loginModal");return}
+  openModal("writeModal");
+}
+document.getElementById("writeForm").addEventListener("submit",async e=>{
+  e.preventDefault(); const s=document.getElementById("writeStatus"); s.className="status"; s.textContent="등록 중...";
+  const type=document.getElementById("writeType").value,title=document.getElementById("writeTitle").value.trim(),content=document.getElementById("writeContent").value.trim(),file=document.getElementById("writeFile").files[0];
+  let attachment_url=null,attachment_name=null;
+  if(file){
+    const safe=file.name.replace(/[^\w.\-가-힣 ]/g,"_");
+    const path=`${currentUser.id}/${crypto.randomUUID()}-${safe}`;
+    const up=await db.storage.from("project-files").upload(path,file,{upsert:false});
+    if(up.error){s.className="status error";s.textContent=up.error.message;return}
+    const pub=db.storage.from("project-files").getPublicUrl(path);
+    attachment_url=pub.data.publicUrl; attachment_name=file.name;
+  }
+  const {error}=await db.from("posts").insert({title,content,post_type:type,author_id:currentUser.id,attachment_url,attachment_name});
+  if(error){s.className="status error";s.textContent=error.message;return}
+  s.className="status ok";s.textContent="등록되었습니다.";
+  e.target.reset(); setTimeout(()=>{closeModal("writeModal");s.textContent="";currentType=type;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.type===type));loadBoard();loadGallery()},500);
+});
+
+async function loadGallery(){
+  const el=document.getElementById("galleryGrid");
+  const {data,error}=await db.from("posts").select("id,title,content,attachment_url,created_at").eq("post_type","gallery").not("attachment_url","is",null).order("created_at",{ascending:false}).limit(12);
+  if(error||!data?.length){el.innerHTML='<div class="empty" style="grid-column:1/-1">아직 등록된 갤러리가 없습니다.</div>';return}
+  el.innerHTML=data.map(p=>`<div class="gallery-item"><img loading="lazy" src="${p.attachment_url}" alt="${escapeHtml(p.title)}"><div class="caption">${escapeHtml(p.title)}</div></div>`).join("");
+}
+
+/* Hero particle animation */
+const canvas=document.getElementById("heroCanvas"),ctx=canvas.getContext("2d"); let particles=[];
+function resizeCanvas(){canvas.width=innerWidth*devicePixelRatio;canvas.height=760*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);particles=Array.from({length:70},()=>({x:Math.random()*innerWidth,y:Math.random()*760,r:Math.random()*2+0.5,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35}))}
+function animate(){ctx.clearRect(0,0,innerWidth,760);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>innerWidth)p.vx*=-1;if(p.y<0||p.y>760)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle="rgba(83,176,255,.55)";ctx.fill()});for(let i=0;i<particles.length;i++)for(let j=i+1;j<particles.length;j++){let a=particles[i],b=particles[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);if(d<130){ctx.strokeStyle=`rgba(70,130,240,${(1-d/130)*.16})`;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}}requestAnimationFrame(animate)}
+addEventListener("resize",resizeCanvas); resizeCanvas(); animate();
+refreshAuth(); loadBoard(); loadGallery();
+</script>
+</body>
+</html>
