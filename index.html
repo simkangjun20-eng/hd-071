@@ -11,20 +11,20 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      --navy:#07142d; --navy2:#0b1f46; --royal:#315eea; --royal2:#4b7cff;
+      --navy:#20242b; --navy2:#2b3038; --royal:#315eea; --royal2:#4b7cff;
       --accent:#35d7ff; --white:#f7f9ff; --muted:#9eacc7; --line:rgba(255,255,255,.11);
       --card:rgba(11,31,70,.72); --danger:#ff5f7a; --success:#45e0a1;
     }
     *{box-sizing:border-box} html{scroll-behavior:smooth}
-    body{margin:0;background:var(--navy);color:var(--white);font-family:"Nanum Gothic",sans-serif;line-height:1.65}
+    body{margin:0;background:#eef1f5;color:#202631;font-family:"Nanum Gothic",sans-serif;line-height:1.65}
     button,input,textarea,select{font:inherit}
     button{cursor:pointer}
     a{color:inherit;text-decoration:none}
     .container{width:min(1180px,92%);margin:auto}
-    header{position:fixed;z-index:50;top:0;left:0;right:0;background:rgba(7,20,45,.68);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    header{position:fixed;z-index:50;top:0;left:0;right:0;background:rgba(32,38,49,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
     .nav{height:72px;display:flex;align-items:center;justify-content:space-between}
     .logo{font-weight:800;letter-spacing:-.04em;font-size:21px}.logo span{color:var(--accent)}
-    .navlinks{display:flex;gap:24px;color:#d7e0f5;font-size:14px}
+    .navlinks{display:flex;gap:24px;color:#e9edf4;font-size:14px}
     .navlinks a:hover{color:var(--accent)}
     .auth-actions{display:flex;gap:8px}
     .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--white);border-radius:10px;padding:10px 15px;font-weight:700}
@@ -33,34 +33,34 @@
     .btn.accent{border:0;background:linear-gradient(135deg,#18bde8,var(--accent));color:#02152a}
     .hero{min-height:760px;display:grid;place-items:center;position:relative;overflow:hidden;padding-top:72px}
     #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.62}
-    .hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,transparent 0,rgba(7,20,45,.22) 35%,rgba(7,20,45,.96) 100%)}
+    .hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,transparent 0,rgba(32,36,43,.22) 35%,rgba(32,36,43,.96) 100%)}
     .orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.26;animation:float 8s ease-in-out infinite}
     .orb.one{width:330px;height:330px;background:var(--royal);left:-100px;top:180px}.orb.two{width:260px;height:260px;background:var(--accent);right:-70px;top:280px;animation-delay:-3s}
     @keyframes float{50%{transform:translate3d(0,-28px) scale(1.06)}}
     .hero-content{position:relative;z-index:2;text-align:center;max-width:850px}
     .eyebrow{display:inline-flex;padding:7px 12px;border:1px solid rgba(53,215,255,.25);background:rgba(53,215,255,.07);border-radius:99px;color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.08em}
     h1{font-size:clamp(42px,7vw,78px);line-height:1.08;letter-spacing:-.06em;margin:20px 0 18px}
-    h1 strong{color:var(--accent)} .hero p{color:#c1cce2;font-size:18px;max-width:690px;margin:0 auto 30px}
+    h1 strong{color:var(--accent)} .hero p{color:#d3d9e4;font-size:18px;max-width:690px;margin:0 auto 30px}
     .hero-cta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
     .section{padding:90px 0}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:26px}
     .section h2{font-size:32px;letter-spacing:-.04em;margin:0}.section-head p{margin:6px 0 0;color:var(--muted)}
     .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .card{background:linear-gradient(160deg,rgba(20,47,96,.78),rgba(8,23,50,.78));border:1px solid var(--line);border-radius:18px;padding:22px;min-height:180px}
+    .card{background:linear-gradient(160deg,#ffffff,#f4f6f9);border:1px solid var(--line);border-radius:18px;padding:22px;min-height:180px}
     .icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(49,94,234,.18);color:var(--accent);font-size:21px;margin-bottom:18px}
     .card h3{margin:0 0 7px}.card p{color:var(--muted);font-size:14px;margin:0}
-    .board-wrap{background:rgba(4,15,34,.5);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    .tabs{display:flex;gap:8px;overflow:auto;padding:5px;margin-bottom:18px}.tab{white-space:nowrap;border:1px solid var(--line);background:transparent;color:#afbdd5;border-radius:10px;padding:11px 16px}.tab.active{background:var(--royal);color:#fff;border-color:transparent}
-    .board-toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}.search{width:min(320px,100%);background:#07172f;border:1px solid var(--line);color:white;border-radius:10px;padding:11px 13px}
-    .board-list{display:grid;gap:9px}.post{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;padding:17px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(11,31,70,.48)}
-    .post-num{color:#7484a3;font-size:13px;text-align:center}.post-title{font-weight:700}.post-meta{color:#7f8fab;font-size:12px;margin-top:4px}.badge{display:inline-block;font-size:11px;padding:3px 7px;border-radius:5px;margin-right:6px;background:rgba(53,215,255,.1);color:var(--accent)}
+    .board-wrap{background:#e3e7ed;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:5px;margin-bottom:18px}.tab{white-space:nowrap;border:1px solid var(--line);background:transparent;color:#596579;border-radius:10px;padding:11px 16px}.tab.active{background:var(--royal);color:#fff;border-color:transparent}
+    .board-toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}.search{width:min(320px,100%);background:#ffffff;border:1px solid var(--line);color:white;border-radius:10px;padding:11px 13px}
+    .board-list{display:grid;gap:9px}.post{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;padding:17px 18px;border:1px solid var(--line);border-radius:14px;background:#ffffff}
+    .post-num{color:#687386;font-size:13px;text-align:center}.post-title{font-weight:700}.post-meta{color:#7a8595;font-size:12px;margin-top:4px}.badge{display:inline-block;font-size:11px;padding:3px 7px;border-radius:5px;margin-right:6px;background:rgba(53,215,255,.1);color:var(--accent)}
     .empty{padding:50px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
-    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-item{aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#091a36;position:relative}.gallery-item img{width:100%;height:100%;object-fit:cover}.gallery-item .caption{position:absolute;left:0;right:0;bottom:0;padding:25px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:13px}
+    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.gallery-item{aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#f7f8fa;position:relative}.gallery-item img{width:100%;height:100%;object-fit:cover}.gallery-item .caption{position:absolute;left:0;right:0;bottom:0;padding:25px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:13px}
     .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.step{position:relative;padding:25px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.stepno{font-size:12px;color:var(--accent);font-weight:800}
-    footer{padding:35px 0;border-top:1px solid var(--line);color:#7484a3;font-size:13px}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal-box{width:min(520px,100%);background:#0a1c3d;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 30px 90px rgba(0,0,0,.45)}
-    .modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.close{background:none;border:0;color:#9eacc7;font-size:24px}
-    .form{display:grid;gap:12px;margin-top:18px}.form label{font-size:13px;color:#b8c5dc}.form input,.form textarea,.form select{width:100%;border:1px solid var(--line);background:#06152f;color:#fff;border-radius:10px;padding:12px;outline:none}.form textarea{min-height:130px;resize:vertical}.form input:focus,.form textarea:focus{border-color:var(--royal2)}
-    .hint{font-size:12px;color:#8493af}.status{font-size:13px;margin-top:8px}.status.error{color:var(--danger)}.status.ok{color:var(--success)}
+    footer{padding:35px 0;border-top:1px solid var(--line);color:#687386;font-size:13px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal-box{width:min(520px,100%);background:#f7f8fa;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 30px 90px rgba(0,0,0,.45)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.close{background:none;border:0;color:#697586;font-size:24px}
+    .form{display:grid;gap:12px;margin-top:18px}.form label{font-size:13px;color:#4e596b}.form input,.form textarea,.form select{width:100%;border:1px solid var(--line);background:#ffffff;color:#fff;border-radius:10px;padding:12px;outline:none}.form textarea{min-height:130px;resize:vertical}.form input:focus,.form textarea:focus{border-color:var(--royal2)}
+    .hint{font-size:12px;color:#7a8595}.status{font-size:13px;margin-top:8px}.status.error{color:var(--danger)}.status.ok{color:var(--success)}
     .userbar{font-size:12px;color:#b7c4da;display:flex;gap:8px;align-items:center}
     @media(max-width:900px){.cards,.gallery{grid-template-columns:repeat(2,1fr)}.navlinks{display:none}.steps{grid-template-columns:1fr}}
     @media(max-width:600px){.cards,.gallery{grid-template-columns:1fr}.post{grid-template-columns:1fr}.post-num{text-align:left}.section{padding:65px 0}.hero{min-height:690px}.board-toolbar{align-items:stretch;flex-direction:column}}
@@ -71,7 +71,7 @@
   <div class="container nav">
     <a class="logo" href="#home">PROJECT<span>HUB</span></a>
     <nav class="navlinks"><a href="#guide">참여안내</a><a href="#boards">게시판</a><a href="#gallery">갤러리</a></nav>
-    <div class="auth-actions" id="authActions"><button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">회원가입</button></div>
+    <div class="auth-actions" id="authActions"><button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">간편가입</button></div>
   </div>
 </header>
 
@@ -82,7 +82,7 @@
       <span class="eyebrow">IN-HOUSE PROJECT PORTAL</span>
       <h1>함께 만들고,<br><strong>함께 성장하는</strong> 프로젝트 허브</h1>
       <p>홍보실에서 운영하는 사내 프로젝트 공간입니다. 프로젝트 공지부터 실무 자료, 구성원 아이디어와 현장 기록까지 한곳에서 확인하고 참여하세요.</p>
-      <div class="hero-cta"><a class="btn primary" href="#boards">프로젝트 게시판 보기</a><button class="btn accent" onclick="openModal('signupModal')">프로젝트 참여하기</button></div>
+      <div class="hero-cta"><a class="btn primary" href="#boards">프로젝트 게시판 보기</a><button class="btn accent" onclick="openModal('signupModal')">회원가입 · 프로젝트 참여</button></div>
     </div>
   </section>
 
@@ -106,7 +106,7 @@
         <button class="tab" data-type="resource">자료실</button>
         <button class="tab" data-type="gallery">갤러리</button>
       </div>
-      <div class="board-toolbar"><div id="loginState" class="userbar">로그인하면 글쓰기와 자료 업로드가 가능합니다.</div><input id="searchInput" class="search" placeholder="게시글 검색" /></div>
+      <div class="board-toolbar"><div id="loginState" class="userbar">로그인 후 글쓰기와 자료 업로드가 가능합니다.</div><input id="searchInput" class="search" placeholder="게시글 검색" /></div>
       <div id="boardContent" class="board-list"></div>
     </div>
   </section>
@@ -124,13 +124,26 @@
 <!-- Login -->
 <div class="modal" id="loginModal"><div class="modal-box">
   <div class="modal-head"><h3>로그인</h3><button class="close" onclick="closeModal('loginModal')">×</button></div>
-  <form class="form" id="loginForm"><label>이메일<input type="email" id="loginEmail" required></label><label>비밀번호<input type="password" id="loginPassword" required minlength="6"></label><button class="btn primary">로그인</button><div id="loginStatus" class="status"></div></form>
+  <form class="form" id="loginForm">
+    <label>이메일<input type="email" id="loginEmail" required placeholder="name@company.com"></label>
+    <label>비밀번호<input type="password" id="loginPassword" required minlength="6" placeholder="6자 이상"></label>
+    <button class="btn primary">로그인</button>
+    <div id="loginStatus" class="status"></div>
+  </form>
 </div></div>
 
 <!-- Signup -->
 <div class="modal" id="signupModal"><div class="modal-box">
   <div class="modal-head"><h3>회원가입</h3><button class="close" onclick="closeModal('signupModal')">×</button></div>
-  <form class="form" id="signupForm"><label>이름<input type="text" id="signupName" required maxlength="50"></label><label>이메일<input type="email" id="signupEmail" required></label><label>비밀번호<input type="password" id="signupPassword" required minlength="6"></label><div class="hint">가입 후 Supabase 이메일 인증이 활성화되어 있다면 인증 메일을 확인하세요.</div><button class="btn primary">계정 만들기</button><div id="signupStatus" class="status"></div></form>
+  <form class="form" id="signupForm">
+    <label>이름<input type="text" id="signupName" required maxlength="50" placeholder="홍길동"></label>
+    <label>회사 이메일<input type="email" id="signupEmail" required placeholder="name@company.com"></label>
+    <label>비밀번호<input type="password" id="signupPassword" required minlength="6" placeholder="6자 이상"></label>
+    <label>비밀번호 확인<input type="password" id="signupPasswordConfirm" required minlength="6" placeholder="비밀번호를 다시 입력"></label>
+    <div class="hint">이메일 인증 없이 바로 계정을 생성합니다.</div>
+    <button class="btn primary">회원가입</button>
+    <div id="signupStatus" class="status"></div>
+  </form>
 </div></div>
 
 <!-- Write -->
@@ -171,27 +184,55 @@ async function refreshAuth(){
     box.innerHTML=`<span class="userbar">${escapeHtml(name)}</span><button class="btn" onclick="logout()">로그아웃</button>`;
     state.innerHTML=`<span class="userbar">● ${escapeHtml(name)}님 로그인 상태 · 게시글 작성 가능</span>`;
   }else{
-    box.innerHTML=`<button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">회원가입</button>`;
-    state.textContent="로그인하면 글쓰기와 자료 업로드가 가능합니다.";
+    box.innerHTML=`<button class="btn" onclick="openModal('loginModal')">로그인</button><button class="btn primary" onclick="openModal('signupModal')">간편가입</button>`;
+    state.textContent="로그인 후 글쓰기와 자료 업로드가 가능합니다.";
   }
 }
 async function logout(){await db.auth.signOut(); await refreshAuth(); loadBoard();}
 
 async function signup(e){
-  e.preventDefault(); const s=document.getElementById("signupStatus");
-  s.className="status"; s.textContent="가입 처리 중...";
-  const email=document.getElementById("signupEmail").value.trim(), password=document.getElementById("signupPassword").value, name=document.getElementById("signupName").value.trim();
-  const {error}=await db.auth.signUp({email,password,options:{data:{name}}});
+  e.preventDefault();
+  const s=document.getElementById("signupStatus");
+  const email=document.getElementById("signupEmail").value.trim();
+  const password=document.getElementById("signupPassword").value;
+  const confirm=document.getElementById("signupPasswordConfirm").value;
+  const name=document.getElementById("signupName").value.trim();
+
+  if(password !== confirm){
+    s.className="status error"; s.textContent="비밀번호가 서로 일치하지 않습니다."; return;
+  }
+  if(password.length < 6){
+    s.className="status error"; s.textContent="비밀번호는 6자 이상 입력하세요."; return;
+  }
+
+  s.className="status"; s.textContent="회원가입 처리 중...";
+  const {data,error}=await db.auth.signUp({
+    email,
+    password,
+    options:{data:{name}}
+  });
+
   if(error){s.className="status error";s.textContent=error.message;return}
-  s.className="status ok";s.textContent="가입되었습니다. 이메일 인증이 필요한 경우 인증 메일을 확인하세요.";
+
+  s.className="status ok";
+  s.textContent="회원가입이 완료되었습니다. 바로 로그인할 수 있습니다.";
   e.target.reset();
+  setTimeout(()=>{closeModal("signupModal");openModal("loginModal");},900);
 }
+
 async function login(e){
-  e.preventDefault(); const s=document.getElementById("loginStatus"); s.textContent="로그인 중...";
-  const {error}=await db.auth.signInWithPassword({email:document.getElementById("loginEmail").value.trim(),password:document.getElementById("loginPassword").value});
+  e.preventDefault();
+  const s=document.getElementById("loginStatus");
+  s.className="status"; s.textContent="로그인 중...";
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+
+  const {error}=await db.auth.signInWithPassword({email,password});
+
   if(error){s.className="status error";s.textContent=error.message;return}
-  s.className="status ok";s.textContent="로그인 성공";
-  setTimeout(()=>{closeModal("loginModal");s.textContent="";refreshAuth();loadBoard()},300);
+
+  s.className="status ok"; s.textContent="로그인 성공";
+  setTimeout(()=>{closeModal("loginModal");s.textContent="";refreshAuth();loadBoard()},400);
 }
 document.getElementById("signupForm").addEventListener("submit",signup);
 document.getElementById("loginForm").addEventListener("submit",login);
